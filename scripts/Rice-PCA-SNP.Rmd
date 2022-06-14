@@ -13,3 +13,8 @@ library(tidyverse)
 library(ggplot2)
 ```
 
+```{r}
+Sys.setenv(VROOM_CONNECTION_SIZE="500000") # needed because the lines in this file are very long.
+data.geno <- read_csv("../input/Rice_44K_genotypes.csv.gz",
+                      na=c("NA","00")) #missing data is denoted as "NA" or "00"
+```
