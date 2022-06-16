@@ -62,3 +62,29 @@ geno.numeric.fill <-
     x})
 ```
 
+```{r}
+geno.pca <- prcomp(geno.numeric.fill, 
+            rank.=10) # Compute the PCs, return the first 10
+
+str(geno.pca)  
+```
+
+```{r}
+head(geno.pca$x)[,1:5] # View the first 5 PCs
+```
+
+Determine proportion of variance explained by each PC:
+```{r}
+pcvar <- geno.pca$sdev^2 # square std dev to get variance
+pcvar.pct <- tibble(pctvar=pcvar/sum(pcvar) * 100,
+                    PC=1:length(pcvar))
+
+head(pcvar.pct)
+```
+
+```{r}
+# Plot the proportion of variance covered by each PC
+pcvar.pct[1:10,] %>% ggplot(mapping = aes(x=PC, y=pctvar)) +
+  geom_col(fill="darkblue")
+```
+
