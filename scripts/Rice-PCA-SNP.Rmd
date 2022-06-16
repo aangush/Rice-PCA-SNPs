@@ -10,11 +10,55 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
-library(ggplot2)
 ```
+
+### Import the Data
 
 ```{r}
 Sys.setenv(VROOM_CONNECTION_SIZE="500000") # needed because the lines in this file are very long.
 data.geno <- read_csv("../input/Rice_44K_genotypes.csv.gz",
                       na=c("NA","00")) #missing data is denoted as "NA" or "00"
 ```
+
+```{r}
+data.geno <- data.geno %>% select(-`6_17160794...22253`) # remove a duplicate column
+```
+
+```{r}
+head(data.geno)
+```
+
+```{r}
+data.geno <- data.geno %>% rename(ID=...1) # Rename the first column to ID
+```
+
+### Construct PCA Plot
+
+_Due to the size of the dataset, a randomly selected subset of 10k SNPs will be used_
+
+```{r}
+set.seed(0421)
+data <- data.geno[,sample(2:ncol(data.geno), 10000)] # Subset the data
+id <- select(data.geno, ID) # Extract the ID column
+data.geno.10k <- data.frame(id, data) # Combine the ID column and 10k SNP subset
+dim(data.geno.10k)
+```
+
+```{r}
+#convert the data matrix to numbers
+geno.numeric <- data.geno.10k[,-1] %>% # -1 to remove the first column, with names.
+  lapply(factor) %>% # convert characters to "factors", where each category is internally represented as a number
+  as.data.frame() %>% # reformat
+  data.matrix() #  convert to numeric
+
+head(geno.numeric[,1:10])
+```
+
+```{r}
+# Fill in missing data with average genotype
+geno.numeric.fill <-
+  apply(geno.numeric, 2, function(x) {
+    x[is.na(x)] <- mean(x, na.rm=T)
+    x})
+```
+
