@@ -84,7 +84,8 @@ head(pcvar.pct)
 
 ```{r}
 # Plot the proportion of variance covered by each PC
-pcvar.pct[1:10,] %>% ggplot(mapping = aes(x=PC, y=pctvar)) +
+pcvar.pct[1:10,] %>% 
+  ggplot(mapping = aes(x=PC, y=pctvar)) +
   geom_col(fill="darkblue")
 ```
 
@@ -101,11 +102,13 @@ head(PCs)
 
 ```{r}
 # Plot the PCs
-PCs %>% ggplot(mapping = aes(x=PC1, y=PC2)) +
+PCs %>% 
+  ggplot(mapping = aes(x=PC1, y=PC2)) +
   labs(title="PC1 vs PC2") +
   geom_point(color="darkblue")
   
-PCs %>% ggplot(mapping = aes(x=PC3, y=PC2)) +
+PCs %>% 
+  ggplot(mapping = aes(x=PC3, y=PC2)) +
   labs(title="PC3 vs PC2") +
   geom_point(color="darkblue")
 ```
@@ -124,7 +127,8 @@ geno.mds$ID <- data.geno.10k$ID
 head(geno.mds) #now we have 2 dimensions + the ID
 
 # Plot V1 vs V2 
-geno.mds %>% ggplot(mapping = aes(x=V1, y=V2)) +
+geno.mds %>% 
+  ggplot(mapping = aes(x=V1, y=V2)) +
   labs(title = "MDS Plot, V1 vs V2") +
   geom_point(color="darkblue") 
 ```
@@ -132,5 +136,83 @@ geno.mds %>% ggplot(mapping = aes(x=V1, y=V2)) +
 _The PCA and MDS plots suggest the existence of at least 3 sub. populations_
 
 
+### Add Phenotypes
+
+```{r}
+data.pheno <- read_csv("../input/RiceDiversity.44K.MSU6.Phenotypes.csv")
+head(data.pheno)
+
+data.pheno.pca <- inner_join(PCs, data.pheno, by=c("ID"="NSFTVID"))
+summary(data.pheno.pca)
+```
+
+```{r}
+# Color PCA plot by Amylose content
+
+data.pheno.pca %>%
+  ggplot(mapping = aes(x=PC1, y=PC2, color=`Amylose content`)) +
+  labs(title = "PC1 vs PC2 colored by Amylose content") +
+  geom_point()
+
+# Color PCA plot by pericarp color
+data.pheno.pca %>% 
+  ggplot(mapping = aes(x=PC1, y=PC2, color=`Pericarp color`)) +
+  labs(title = "PC1 vs PC2 colored by Pericarp color") +  
+  geom_point()
+
+# Color PCA plot by Region
+data.pheno.pca %>%
+  ggplot(mapping = aes(x=PC1, y=PC2, color=`Region`)) +
+  labs(title = "PC1 vs PC2 colored by Region") +
+  scale_color_brewer(type="qual", palette = "Set1") +
+  geom_point()
+```
+
+
+### Population assignments with fastStructure
+
+
+##### Create the genotype file
+
+```{r}
+# Create a new Matrix to hold reformatted data
+data.geno.10k.fs <- matrix("",nrow=nrow(data.geno.10k)*2,ncol=ncol(data.geno.10k)-1+6)
+
+# for each row of genotypes, create 2 rows, one with the first allele and one with the second allele.
+# also, fill the first 6 columns with the strain ID (could also be blank but we need something there)
+for (i in 1:nrow(data.geno.10k)) {
+  data.geno.10k.fs[(i-1)*2+1,1:6] <- data.geno.10k[[i,1]]
+  data.geno.10k.fs[(i-1)*2+2,1:6] <- data.geno.10k[[i,1]]
+  data.geno.10k.fs[(i-1)*2+1,-1:-6] <- substr(data.geno.10k[i,-1],1,1)
+  data.geno.10k.fs[(i-1)*2+2,-1:-6] <- substr(data.geno.10k[i,-1],2,2)
+}
+
+data.geno.10k.fs[is.na(data.geno.10k.fs)] <- -9 # fastStructure's code for missing data
+
+dim(data.geno.10k.fs)
+
+# take a look
+data.geno.10k.fs[1:10,1:10]
+
+write.table(data.geno.10k.fs,file="../output/rice.data.fastStructure.input.str", col.names = FALSE, row.names = FALSE, quote = FALSE)
+```
+
+##### Create the .fam file
+
+```{r}
+fam <- tibble(
+  FID=data.geno.10k$ID,
+  IID=data.geno.10k$ID,
+  PID=0,
+  MID=0,
+  Sex=0,
+  Ptype=-9)
+
+head(fam)
+```
+
+```{r}
+write.table(fam,file="../output/rice.data.fastStructure.input.fam",col.names = FALSE, row.names = FALSE, quote = FALSE)
+```
 
 
