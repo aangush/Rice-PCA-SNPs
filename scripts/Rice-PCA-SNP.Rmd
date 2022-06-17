@@ -215,4 +215,40 @@ head(fam)
 write.table(fam,file="../output/rice.data.fastStructure.input.fam",col.names = FALSE, row.names = FALSE, quote = FALSE)
 ```
 
+##### Create the .bim file
+
+```{r}
+bim <- data.geno.10k.fs[,-1:-6]
+
+colnames(bim) <- colnames(data.geno.10k)[-1]
+
+bim[bim=="-9"] <- NA
+
+bim <- apply(bim,2,function(x) unique(na.omit(x))) 
+
+bim[,1:5]
+```
+
+```{r}
+bim <- t(bim) %>%  # t transposes the matrix
+  as_tibble() %>%
+  mutate(SNP_ID=colnames(bim), cM=0) 
+
+head(bim) # now we have a table where each row is a SNP
+```
+
+```{r}
+# Separate SNP_ID to get chromosome and position
+
+bim <- bim %>% 
+  separate(SNP_ID,into = c("chromosome","position"),sep="_",remove=FALSE) %>% # create a column for chromosome and position
+  select(chromosome, SNP_ID, cM, position, allele1=V1, allele2=V2) # get columns in right order
+
+head(bim)
+```
+
+```{r}
+write.table(bim,file="../output/rice.data.fastStructure.input.bim",col.names = FALSE, row.names = FALSE, quote = FALSE)
+```
+
 
