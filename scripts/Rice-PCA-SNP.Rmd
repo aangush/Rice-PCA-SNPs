@@ -88,3 +88,49 @@ pcvar.pct[1:10,] %>% ggplot(mapping = aes(x=PC, y=pctvar)) +
   geom_col(fill="darkblue")
 ```
 
+Make a tibble with the PCs and IDs
+```{r}
+PCs <- as_tibble(geno.pca$x) %>% # The calculated PCs
+  mutate(ID=data.geno.10k$ID) %>%
+  select(ID, everything())
+
+head(PCs)
+```
+
+### PC and MDS Plots
+
+```{r}
+# Plot the PCs
+PCs %>% ggplot(mapping = aes(x=PC1, y=PC2)) +
+  labs(title="PC1 vs PC2") +
+  geom_point(color="darkblue")
+  
+PCs %>% ggplot(mapping = aes(x=PC3, y=PC2)) +
+  labs(title="PC3 vs PC2") +
+  geom_point(color="darkblue")
+```
+
+```{r}
+# Make an MDS Plot
+
+# calculate the Euclidian distance between each rice variety
+genDist <- as.matrix(dist(geno.numeric))
+
+# perform multi-dimensional scaling
+geno.mds <- as_tibble(cmdscale(genDist))
+
+# Add the variety ID back into this
+geno.mds$ID <- data.geno.10k$ID 
+head(geno.mds) #now we have 2 dimensions + the ID
+
+# Plot V1 vs V2 
+geno.mds %>% ggplot(mapping = aes(x=V1, y=V2)) +
+  labs(title = "MDS Plot, V1 vs V2") +
+  geom_point(color="darkblue") 
+```
+
+_The PCA and MDS plots suggest the existence of at least 3 sub. populations_
+
+
+
+
