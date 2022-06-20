@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-### Import the Data
+## Import the Data
 
 ```{r}
 Sys.setenv(VROOM_CONNECTION_SIZE="500000") # needed because the lines in this file are very long.
@@ -22,9 +22,7 @@ data.geno <- read_csv("../input/Rice_44K_genotypes.csv.gz",
 
 ```{r}
 data.geno <- data.geno %>% select(-`6_17160794...22253`) # remove a duplicate column
-```
 
-```{r}
 head(data.geno)
 ```
 
@@ -32,9 +30,12 @@ head(data.geno)
 data.geno <- data.geno %>% rename(ID=...1) # Rename the first column to ID
 ```
 
-### Construct PCA Plot
 
-_Due to the size of the dataset, a randomly selected subset of 10k SNPs will be used_
+## Construct PCA Plot
+
+
+
+_Due to the size of the dataset, a randomly selected subset of 10k SNPs will be used_ (I will soon modify this to use the full dataset)
 
 ```{r}
 set.seed(0421)
@@ -44,8 +45,10 @@ data.geno.10k <- data.frame(id, data) # Combine the ID column and 10k SNP subset
 dim(data.geno.10k)
 ```
 
+
+
+Convert the data matrix to numbers
 ```{r}
-#convert the data matrix to numbers
 geno.numeric <- data.geno.10k[,-1] %>% # -1 to remove the first column, with names.
   lapply(factor) %>% # convert characters to "factors", where each category is internally represented as a number
   as.data.frame() %>% # reformat
@@ -54,13 +57,15 @@ geno.numeric <- data.geno.10k[,-1] %>% # -1 to remove the first column, with nam
 head(geno.numeric[,1:10])
 ```
 
+Fill in missing data with average genotype
+
 ```{r}
-# Fill in missing data with average genotype
 geno.numeric.fill <-
   apply(geno.numeric, 2, function(x) {
     x[is.na(x)] <- mean(x, na.rm=T)
     x})
 ```
+
 
 ```{r}
 geno.pca <- prcomp(geno.numeric.fill, 
@@ -69,9 +74,11 @@ geno.pca <- prcomp(geno.numeric.fill,
 str(geno.pca)  
 ```
 
+
 ```{r}
 head(geno.pca$x)[,1:5] # View the first 5 PCs
 ```
+
 
 Determine proportion of variance explained by each PC:
 ```{r}
@@ -82,12 +89,14 @@ pcvar.pct <- tibble(pctvar=pcvar/sum(pcvar) * 100,
 head(pcvar.pct)
 ```
 
+
+Plot the proportion of variance covered by each PC
 ```{r}
-# Plot the proportion of variance covered by each PC
 pcvar.pct[1:10,] %>% 
   ggplot(mapping = aes(x=PC, y=pctvar)) +
   geom_col(fill="darkblue")
 ```
+
 
 Make a tibble with the PCs and IDs
 ```{r}
@@ -98,10 +107,12 @@ PCs <- as_tibble(geno.pca$x) %>% # The calculated PCs
 head(PCs)
 ```
 
-### PC and MDS Plots
 
+## PC and MDS Plots
+
+
+Plot the PCs
 ```{r}
-# Plot the PCs
 PCs %>% 
   ggplot(mapping = aes(x=PC1, y=PC2)) +
   labs(title="PC1 vs PC2") +
@@ -113,9 +124,9 @@ PCs %>%
   geom_point(color="darkblue")
 ```
 
-```{r}
-# Make an MDS Plot
 
+Make an MDS Plot
+```{r}
 # calculate the Euclidian distance between each rice variety
 genDist <- as.matrix(dist(geno.numeric))
 
@@ -136,7 +147,8 @@ geno.mds %>%
 _The PCA and MDS plots suggest the existence of at least 3 sub. populations_
 
 
-### Add Phenotypes
+## Add Phenotype data
+
 
 ```{r}
 data.pheno <- read_csv("../input/RiceDiversity.44K.MSU6.Phenotypes.csv")
@@ -146,6 +158,8 @@ data.pheno.pca <- inner_join(PCs, data.pheno, by=c("ID"="NSFTVID"))
 summary(data.pheno.pca)
 ```
 
+
+Color the PCA plots by different phenotypes
 ```{r}
 # Color PCA plot by Amylose content
 
@@ -169,11 +183,10 @@ data.pheno.pca %>%
 ```
 
 
-### Population assignments with fastStructure
+## Population assignments with fastStructure
 
 
-##### Create the genotype file
-
+Create the genotype file
 ```{r}
 # Create a new Matrix to hold reformatted data
 data.geno.10k.fs <- matrix("",nrow=nrow(data.geno.10k)*2,ncol=ncol(data.geno.10k)-1+6)
@@ -197,8 +210,9 @@ data.geno.10k.fs[1:10,1:10]
 write.table(data.geno.10k.fs,file="../output/rice.data.fastStructure.input.str", col.names = FALSE, row.names = FALSE, quote = FALSE)
 ```
 
-##### Create the .fam file
 
+
+Create the .fam file
 ```{r}
 fam <- tibble(
   FID=data.geno.10k$ID,
@@ -215,8 +229,9 @@ head(fam)
 write.table(fam,file="../output/rice.data.fastStructure.input.fam",col.names = FALSE, row.names = FALSE, quote = FALSE)
 ```
 
-##### Create the .bim file
 
+
+Create the .bim file
 ```{r}
 bim <- data.geno.10k.fs[,-1:-6]
 
@@ -229,6 +244,7 @@ bim <- apply(bim,2,function(x) unique(na.omit(x)))
 bim[,1:5]
 ```
 
+
 ```{r}
 bim <- t(bim) %>%  # t transposes the matrix
   as_tibble() %>%
@@ -236,6 +252,7 @@ bim <- t(bim) %>%  # t transposes the matrix
 
 head(bim) # now have a table where each row is a SNP
 ```
+
 
 ```{r}
 # Separate SNP_ID to get chromosome and position
@@ -252,17 +269,21 @@ write.table(bim,file="../output/rice.data.fastStructure.input.bim",col.names = F
 ```
 
 
-### Running fastStructure
+## Running fastStructure
 
-Running on Ubuntu v. 20.04 via WSL
 
-_The following code was executed within my fastStructure-master directory_
+_Run on Ubuntu v. 20.04 via WSL_
+
+The following bash code was executed within the fastStructure-master directory:
+
 
 ```
 python structure.py -K 4 --input=/mnt/c/Users/aangu/bioinfo/bis180L/Rice-PCA-SNPs/output/rice.data.fastStructure.input --output=/mnt/c/Users/aangu/bioinfo/bis180L/Rice-PCA-SNPs/output/rice.fastStructure.out --format=str
 ```
 
-### Processing fastStructure results
+
+## Processing fastStructure results
+
 
 ```{r}
 fs_results <- read_delim("../output/rice.fastStructure.out.4.meanQ", delim="  ", col_names = FALSE, col_types = 'nnnn')
@@ -277,15 +298,16 @@ fs_results <- fs_results %>%
 head(fs_results)
 ```
 
+
+Assign each individual to a sub population based on fastStructure data
 ```{r}
-# assign each individual to a sub population based on fastStructure data
 fs_results$assignedPop <- apply(fs_results[,-1], 1, which.max)
 head(fs_results)
 ```
 
 
+Order samples based on sub pop. identity
 ```{r}
-# Order samples based on sub pop. identity
 
 fs_results$maxPr <- apply(fs_results[,2:5],1,max) 
 fs_results <- fs_results %>% 
@@ -296,16 +318,18 @@ head(fs_results)
 ```
 
 
+Convert the data to long format
 ```{r}
-# Convert the data to long format
-
 fs_results_long <- fs_results %>% pivot_longer(pop1:pop4, 
                                                names_to="population",
                                                values_to="proportion")
 head(fs_results_long)
 ```
 
-### Plot the fastStructure results
+
+
+## Plot the fastStructure results
+
 
 ```{r}
 fs_results_long %>%
@@ -315,30 +339,34 @@ fs_results_long %>%
   scale_color_brewer(type="div") + scale_fill_brewer(type="div")
 ```
 
-#### Compare sub pop. assignments to the PCA plots
 
+##### Compare sub pop. assignments to the PCA plots
+
+
+Combine the PC data with the fastStructure data
 ```{r}
-# Combine the PC data with the fastStructure data
 
 fs_results <- fs_results %>% mutate(assignedPop=as.character(assignedPop))
 
 geno.pca.pop <- inner_join(fs_results, PCs, by="ID")
 ```
 
-```{r}
-# PCA plots colored by sub pop.
 
+PCA plots colored by sub pop.
+```{r}
+# PC1 vs PC2
 geno.pca.pop %>% ggplot(mapping = aes(x=PC1, y=PC2, color=assignedPop)) +
   labs(title="PC1 vs PC2 colored by sub pop. assignment") +
   geom_point()
 
+# PC2 vs PC3
 geno.pca.pop %>% ggplot(mapping = aes(x=PC3, y=PC2, color=assignedPop)) +
   labs(title="PC3 vs PC2 colored by sub pop. assignment") +
   geom_point()
 ```
 
+Save some of the objects created
 ```{r}
-# Save some of the objects created
 save(data.pheno,geno.pca, PCs, geno.pca.pop,fs_results,file="../output/data_from_SNP_lab.Rdata")
 ```
 
