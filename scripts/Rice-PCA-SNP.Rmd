@@ -305,8 +305,17 @@ fs_results_long <- fs_results %>% pivot_longer(pop1:pop4,
 head(fs_results_long)
 ```
 
+### Plot the fastStructure results
 
+```{r}
+fs_results_long %>%
+  ggplot(aes(x=plot.order, y=proportion, color=population, fill=population)) + 
+  geom_col()  +
+  ylab("genome proportion") + 
+  scale_color_brewer(type="div") + scale_fill_brewer(type="div")
+```
 
+#### Compare sub pop. assignments to the PCA plots
 
 
 
