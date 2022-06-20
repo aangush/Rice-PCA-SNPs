@@ -251,13 +251,64 @@ head(bim)
 write.table(bim,file="../output/rice.data.fastStructure.input.bim",col.names = FALSE, row.names = FALSE, quote = FALSE)
 ```
 
+
 ### Running fastStructure
 
+Running on Ubuntu v. 20.04 via WSL
 
-Running on Ubuntu v. 20.04 using WSL
-
-The following code was executed within the fastStructure-master directory
+_The following code was executed within my fastStructure-master directory_
 
 ```
 python structure.py -K 4 --input=/mnt/c/Users/aangu/bioinfo/bis180L/Rice-PCA-SNPs/output/rice.data.fastStructure.input --output=/mnt/c/Users/aangu/bioinfo/bis180L/Rice-PCA-SNPs/output/rice.fastStructure.out --format=str
 ```
+
+### Processing fastStructure results
+
+```{r}
+fs_results <- read_delim("../output/rice.fastStructure.out.4.meanQ", delim="  ", col_names = FALSE, col_types = 'nnnn')
+head(fs_results)
+```
+
+Add the sample IDs back and assign names to each pop.
+```{r}
+fs_results <- fs_results %>% 
+  mutate(ID=data.geno.10000$ID) %>% 
+  select(ID, pop1=X1, pop2=X2, pop3=X3, pop4=X4)
+head(fs_results)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
