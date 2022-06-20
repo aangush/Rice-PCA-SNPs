@@ -272,11 +272,16 @@ head(fs_results)
 Add the sample IDs back and assign names to each pop.
 ```{r}
 fs_results <- fs_results %>% 
-  mutate(ID=data.geno.10000$ID) %>% 
+  mutate(ID=data.geno.10k$ID) %>% 
   select(ID, pop1=X1, pop2=X2, pop3=X3, pop4=X4)
 head(fs_results)
 ```
 
+```{r}
+# assign each individual to a sub population based on fastStructure data
+fs_results$assignedPop <- apply(fs_results[,-1], 1, which.max)
+head(fs_results)
+```
 
 
 
