@@ -284,8 +284,26 @@ head(fs_results)
 ```
 
 
+```{r}
+# Order samples based on sub pop. identity
+
+fs_results$maxPr <- apply(fs_results[,2:5],1,max) 
+fs_results <- fs_results %>% 
+  arrange(assignedPop,desc(maxPr)) %>%
+  mutate(plot.order=row_number())
+
+head(fs_results)
+```
 
 
+```{r}
+# Convert the data to long format
+
+fs_results_long <- fs_results %>% pivot_longer(pop1:pop4, 
+                                               names_to="population",
+                                               values_to="proportion")
+head(fs_results_long)
+```
 
 
 
