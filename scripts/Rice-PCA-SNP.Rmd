@@ -317,30 +317,28 @@ fs_results_long %>%
 
 #### Compare sub pop. assignments to the PCA plots
 
+```{r}
+# Combine the PC data with the fastStructure data
 
+fs_results <- fs_results %>% mutate(assignedPop=as.character(assignedPop))
 
+geno.pca.pop <- inner_join(fs_results, PCs, by="ID")
+```
 
+```{r}
+# PCA plots colored by sub pop.
 
+geno.pca.pop %>% ggplot(mapping = aes(x=PC1, y=PC2, color=assignedPop)) +
+  labs(title="PC1 vs PC2 colored by sub pop. assignment") +
+  geom_point()
 
+geno.pca.pop %>% ggplot(mapping = aes(x=PC3, y=PC2, color=assignedPop)) +
+  labs(title="PC3 vs PC2 colored by sub pop. assignment") +
+  geom_point()
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```{r}
+# Save some of the objects created
+save(data.pheno,geno.pca, PCs, geno.pca.pop,fs_results,file="../output/data_from_SNP_lab.Rdata")
+```
 
