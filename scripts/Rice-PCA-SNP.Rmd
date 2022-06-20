@@ -191,7 +191,7 @@ data.geno.10k.fs[is.na(data.geno.10k.fs)] <- -9 # fastStructure's code for missi
 
 dim(data.geno.10k.fs)
 
-# take a look
+# look at the data
 data.geno.10k.fs[1:10,1:10]
 
 write.table(data.geno.10k.fs,file="../output/rice.data.fastStructure.input.str", col.names = FALSE, row.names = FALSE, quote = FALSE)
@@ -234,7 +234,7 @@ bim <- t(bim) %>%  # t transposes the matrix
   as_tibble() %>%
   mutate(SNP_ID=colnames(bim), cM=0) 
 
-head(bim) # now we have a table where each row is a SNP
+head(bim) # now have a table where each row is a SNP
 ```
 
 ```{r}
@@ -251,4 +251,13 @@ head(bim)
 write.table(bim,file="../output/rice.data.fastStructure.input.bim",col.names = FALSE, row.names = FALSE, quote = FALSE)
 ```
 
+### Running fastStructure
 
+
+Running on Ubuntu v. 20.04 using WSL
+
+The following code was executed within the fastStructure-master directory
+
+```
+python structure.py -K 4 --input=/mnt/c/Users/aangu/bioinfo/bis180L/Rice-PCA-SNPs/output/rice.data.fastStructure.input --output=/mnt/c/Users/aangu/bioinfo/bis180L/Rice-PCA-SNPs/output/rice.fastStructure.out --format=str
+```
