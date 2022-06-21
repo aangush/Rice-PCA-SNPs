@@ -25,4 +25,10 @@ This analysis begins with loading data from a .csv file that contains processed 
 2. Principal components were computed, appended to the data
 3. PCA and MDS plots were created, along with a plot showing the variance explained by each PC
 
-The PCA plots suggested the existence of 3 or 4 sub populations in the 
+The PCA plots suggested the existence of 3 or 4 sub populations within the data. This SNP data will ultimately be used in a GWAS for certain rice phenotypes (ex. seed length or seed length:width ratio), so _fastStructure_ was used with K=4 sub populations.
+
+1. The genotype, .fam, and .bim files necessary to use fastStructure were created
+2. fastStructure was run on _WSL on Ubuntu 20.04_
+3. Each sample was assigned to a fastStructure sub population 
+
+Finally, the population assignments, and PC data was combined, and the PCA plots were colored by fastStructure sub population. Admixture was observed (as expected)
