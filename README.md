@@ -19,4 +19,10 @@ This repo contains 3 directories: `input`, `output` and `scripts`. `input` and `
 ### Workflow Overview
 ---
 
-This analysis begins with loading data from a .csv file that contains processed SNP locations derived from a .vcf file. 
+This analysis begins with loading data from a .csv file that contains processed SNP locations derived from a .vcf file, contaning sample information in the left column, with all subsequent columns as genome locations, and column entries as SNPs at those locations. Then:
+
+1. Missing data was filled in with the average genotype
+2. Principal components were computed, appended to the data
+3. PCA and MDS plots were created, along with a plot showing the variance explained by each PC
+
+The PCA plots suggested the existence of 3 or 4 sub populations in the 
