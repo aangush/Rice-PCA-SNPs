@@ -147,3 +147,8 @@ bim <- bim %>%
   select(chromosome, SNP_ID, cM, position, allele1=V1, allele2=V2) # get columns in right order
 write.table(bim,file="../output/rice.data.fastStructure.input.bim",col.names = FALSE, row.names = FALSE, quote = FALSE)
 
+# The next lines below contain the bash code used to run fastStructure on Ubuntu 20.04 via WSL
+
+# python structure.py -K 4 --input=/mnt/c/Users/aangu/bioinfo/bis180L/Rice-PCA-SNPs/output/rice.data.fastStructure.input 
+# --output=/mnt/c/Users/aangu/bioinfo/bis180L/Rice-PCA-SNPs/output/rice.fastStructure.out --format=str
+
