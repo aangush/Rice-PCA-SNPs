@@ -103,7 +103,33 @@ data.pheno.pca %>%
 
 # fastStructure data preparation
 
+# Create the genotype file
+# Create a new Matrix to hold reformatted data
+data.geno.10k.fs <- matrix("",nrow=nrow(data.geno.10k)*2,ncol=ncol(data.geno.10k)-1+6)
 
+# for each row of genotypes, create 2 rows, one with the first allele and one with the second allele.
+# also, fill the first 6 columns with the strain ID (could also be blank but we need something there)
+for (i in 1:nrow(data.geno.10k)) {
+  data.geno.10k.fs[(i-1)*2+1,1:6] <- data.geno.10k[[i,1]]
+  data.geno.10k.fs[(i-1)*2+2,1:6] <- data.geno.10k[[i,1]]
+  data.geno.10k.fs[(i-1)*2+1,-1:-6] <- substr(data.geno.10k[i,-1],1,1)
+  data.geno.10k.fs[(i-1)*2+2,-1:-6] <- substr(data.geno.10k[i,-1],2,2)
+}
+
+data.geno.10k.fs[is.na(data.geno.10k.fs)] <- -9 # fastStructure's code for missing data
+
+dim(data.geno.10k.fs)
+
+write.table(data.geno.10k.fs,file="../output/rice.data.fastStructure.input.str", col.names = FALSE, row.names = FALSE, quote = FALSE)
+
+# Create the .fam file
+fam <- tibble(
+  FID=data.geno.10k$ID,
+  IID=data.geno.10k$ID,
+  PID=0,
+  MID=0,
+  Sex=0,
+  Ptype=-9)
 
 
 
