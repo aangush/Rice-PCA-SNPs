@@ -67,9 +67,10 @@ geno.numeric.fill <-
 ```
 
 
+Compute the PCs and return the first 10
 ```{r}
 geno.pca <- prcomp(geno.numeric.fill, 
-            rank.=10) # Compute the PCs, return the first 10
+            rank.=10)
 
 str(geno.pca)  
 ```
