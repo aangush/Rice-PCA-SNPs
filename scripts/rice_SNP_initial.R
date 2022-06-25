@@ -59,6 +59,7 @@ PCs %>%
   geom_point(color="darkblue")
 
 # Create an MDS plot
+
 # calculate the Euclidian distance between each rice variety
 genDist <- as.matrix(dist(geno.numeric))
 
@@ -80,6 +81,7 @@ data.pheno.pca <- inner_join(PCs, data.pheno, by=c("ID"="NSFTVID"))
 
 
 # Color the PCA plots by different phenotypes
+
 # Color PCA plot by Amylose content
 data.pheno.pca %>%
   ggplot(mapping = aes(x=PC1, y=PC2, color=`Amylose content`)) +
@@ -104,6 +106,7 @@ data.pheno.pca %>%
 # fastStructure data preparation
 
 # Create the genotype file
+
 # Create a new Matrix to hold reformatted data
 data.geno.10k.fs <- matrix("",nrow=nrow(data.geno.10k)*2,ncol=ncol(data.geno.10k)-1+6)
 
@@ -130,23 +133,17 @@ fam <- tibble(
   MID=0,
   Sex=0,
   Ptype=-9)
+write.table(fam,file="../output/rice.data.fastStructure.input.fam",col.names = FALSE, row.names = FALSE, quote = FALSE)
 
+# Create the .bim file
+bim <- t(bim) %>%  # t transposes the matrix
+  as_tibble() %>%
+  mutate(SNP_ID=colnames(bim), cM=0) 
+# Now have a table where each row is a SNP
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Separate SNP_ID to get chromosome and position
+bim <- bim %>% 
+  separate(SNP_ID,into = c("chromosome","position"),sep="_",remove=FALSE) %>% # create a column for chromosome and position
+  select(chromosome, SNP_ID, cM, position, allele1=V1, allele2=V2) # get columns in right order
+write.table(bim,file="../output/rice.data.fastStructure.input.bim",col.names = FALSE, row.names = FALSE, quote = FALSE)
 
