@@ -67,7 +67,6 @@ geno.mds <- as_tibble(cmdscale(genDist))
 
 # Add the variety ID back into this
 geno.mds$ID <- data.geno.10k$ID 
-head(geno.mds) #now we have 2 dimensions + the ID
 
 # Plot V1 vs V2 
 geno.mds %>% 
@@ -75,11 +74,34 @@ geno.mds %>%
   labs(title = "MDS Plot, V1 vs V2") +
   geom_point(color="darkblue") 
 
+# Add phenotype data
+data.pheno <- read_csv("../input/RiceDiversity.44K.MSU6.Phenotypes.csv")
+data.pheno.pca <- inner_join(PCs, data.pheno, by=c("ID"="NSFTVID"))
+
+
+# Color the PCA plots by different phenotypes
+# Color PCA plot by Amylose content
+data.pheno.pca %>%
+  ggplot(mapping = aes(x=PC1, y=PC2, color=`Amylose content`)) +
+  labs(title = "PC1 vs PC2 colored by Amylose content") +
+  geom_point()
+
+# Color PCA plot by pericarp color
+data.pheno.pca %>% 
+  ggplot(mapping = aes(x=PC1, y=PC2, color=`Pericarp color`)) +
+  labs(title = "PC1 vs PC2 colored by Pericarp color") +  
+  geom_point()
+
+# Color PCA plot by Region
+data.pheno.pca %>%
+  ggplot(mapping = aes(x=PC1, y=PC2, color=`Region`)) +
+  labs(title = "PC1 vs PC2 colored by Region") +
+  scale_color_brewer(type="qual", palette = "Set1") +
+  geom_point()
 
 
 
-
-
+# fastStructure data preparation
 
 
 
