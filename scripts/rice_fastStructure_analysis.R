@@ -6,6 +6,8 @@
 # --output=/mnt/c/Users/aangu/bioinfo/bis180L/Rice-PCA-SNPs/output/rice.fastStructure.out --format=str
 
 
+library(tidyverse)
+
 # Load the fastStructure results
 fs_results <- read_delim("../output/rice.fastStructure.out.4.meanQ", delim="  ", col_names = FALSE, col_types = 'nnnn')
 
@@ -16,6 +18,7 @@ fs_results <- fs_results %>%
 
 # Assign each individual to a sub pop.
 fs_results$assignedPop <- apply(fs_results[,-1], 1, which.max)
+
 
 # Order samples based on population identity
 fs_results$maxPr <- apply(fs_results[,2:5],1,max) 
@@ -41,6 +44,7 @@ fs_results_long %>%
 fs_results <- fs_results %>% mutate(assignedPop=as.character(assignedPop))
 geno.pca.pop <- inner_join(fs_results, PCs, by="ID")
 
+
 # PCA plots colored by pop. assignment
 # PC1 vs PC2
 geno.pca.pop %>% ggplot(mapping = aes(x=PC1, y=PC2, color=assignedPop)) +
@@ -51,16 +55,5 @@ geno.pca.pop %>% ggplot(mapping = aes(x=PC1, y=PC2, color=assignedPop)) +
 geno.pca.pop %>% ggplot(mapping = aes(x=PC3, y=PC2, color=assignedPop)) +
   labs(title="PC3 vs PC2 colored by sub pop. assignment") +
   geom_point()
-
-
-
-
-
-
-
-
-
-
-
 
 
