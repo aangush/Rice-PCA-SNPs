@@ -14,7 +14,7 @@ The analyses conducted in this repo of the rice sequencing data will subsequentl
 ### File structure
 ---
 
-This repo contains 3 directories: `input`, `output` and `scripts`. `input` and `output` contain input and output data to be fed into programs (like fastStructure), and `scripts` contains a .Rmd file with all code used in this analysis and the outputs of it, knitted to html format for viewing. In the future, I will also include .R scripts which will contain all code necessary to carry out the analyses.
+This repo contains 3 directories: `input`, `output` and `scripts`. `input` and `output` contain input and output data to be fed into programs (like fastStructure), and `scripts` contains a .Rmd file with all code used in this analysis and the outputs of it, knitted to html format for viewing. Additionally, `scripts` contains two R scripts: `Rice_SNP_initial.R` and `rice_fastStructure_analysis.R`. The former contains all R used before running fastStructure (ex. format raw data, compute PCs, create PCA and MDS plots), and the latter contains all R used after running fastStruture (ex. assigning sub pops, overlaying pop. assignments with PCA plots.
 
 ### Workflow Overview
 ---
