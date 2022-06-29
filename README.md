@@ -37,8 +37,8 @@ The PCA plots suggested the existence of 3 or 4 sub populations within the data.
 4. The PCs and fastStructure population assignments were combined
 5. New PCA plots colored by population assignment were created (see plot below)
 
-![fastStructure results visualized](fastresults.png)
+![fastStructure results visualized](fastresults)
 
-![new PCA plot colored by pop. assignment](pca_pops.png)
+![new PCA plot colored by pop. assignment](pca_pops)
 
 
