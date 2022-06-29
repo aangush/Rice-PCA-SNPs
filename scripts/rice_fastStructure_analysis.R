@@ -27,9 +27,12 @@ fs_results <- fs_results %>%
 fs_results_long <- fs_results %>% pivot_longer(pop1:pop4, 
                                                names_to="population",
                                                values_to="proportion")
-
-
-
+# Plot the fastStructure results
+fs_results_long %>%
+  ggplot(aes(x=plot.order, y=proportion, color=population, fill=population)) + 
+  geom_col()  +
+  ylab("genome proportion") + 
+  scale_color_brewer(type="div") + scale_fill_brewer(type="div")
 
 
 
