@@ -39,6 +39,6 @@ The PCA plots suggested the existence of 3 or 4 sub populations within the data.
 
 ![fastStructure results visualized](fastresults.png)
 
-![new PCA plot colored by pop. assignment](pca_pops)
+![new PCA plot colored by pop. assignment](pca_pops.png)
 
 
