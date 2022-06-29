@@ -35,6 +35,22 @@ fs_results_long %>%
   scale_color_brewer(type="div") + scale_fill_brewer(type="div")
 
 
+# Compare sub pop. assignments to PCA plot
+
+# Combine PCs with fastStructure data
+fs_results <- fs_results %>% mutate(assignedPop=as.character(assignedPop))
+geno.pca.pop <- inner_join(fs_results, PCs, by="ID")
+
+# PCA plots colored by pop. assignment
+# PC1 vs PC2
+geno.pca.pop %>% ggplot(mapping = aes(x=PC1, y=PC2, color=assignedPop)) +
+  labs(title="PC1 vs PC2 colored by sub pop. assignment") +
+  geom_point()
+
+# PC2 vs PC3
+geno.pca.pop %>% ggplot(mapping = aes(x=PC3, y=PC2, color=assignedPop)) +
+  labs(title="PC3 vs PC2 colored by sub pop. assignment") +
+  geom_point()
 
 
 
